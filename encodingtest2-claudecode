@@ -1,0 +1,149 @@
+This is the second encoding test with the same file: 1999-1-condradie, e..pdf. This time i tried to use claude code within the folder on the computer to make the pdf into an xml file. This seems to work faster, but it uses A LOT of tokens. 
+It asked questions without prompting, working with Arne's TEI header example from the LabArchive record. 
+
+
+# Plan: TEI P5 XML Encoding of 1999-1-conradie, e..pdf
+
+## Context
+
+The user has a collection of 44 academic journal articles (PDFs) from what appears to be the
+Journal of Religion & Society (JRS), spanning 1999–2004. The goal is to encode the first article —
+by E. Conradie, 1999, article 1 — as a TEI P5-compliant XML file. A header template (adapted from
+the Princeton Barth Project / Zwischen den Zeiten encoding) has been provided and must be adapted
+for the JRS journal and this specific article.
+
+---
+
+## Source Document: 1999-1-conradie, e..pdf
+
+**File path:** `C:\Users\hc894\Documents\JRS_pdfs_changh\1999-1-conradie, e..pdf`
+
+**Key bibliographic data to be extracted from the PDF:**
+- Article title (confirmed from PDF content)
+- Author full name: E. Conradie (first name to be verified)
+- Journal title, volume, issue, page range
+- Any editors, contributors listed
+- Publisher and place of original publication
+- Language(s) used in the article
+- Presence of footnotes, endnotes, bibliography, abstract, section headings
+
+---
+
+## Output File
+
+**Path:** `C:\Users\hc894\Documents\JRS_pdfs_changh\1999-1-conradie, e..xml`
+
+---
+
+## TEI Header Plan
+
+The header follows the user-provided template, with these JRS-specific adaptations:
+
+### Processing instructions (top of file)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng"
+            type="application/xml"
+            schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng"
+            type="application/xml"
+            schematypens="http://purl.oclc.org/dml/ns/structure/1.0"?>
+```
+
+### `<fileDesc>` / `<titleStmt>`
+- `<title>`: Electronic edition of "[Article Title]" (Journal of Religion & Society, [year], volume [X], issue [Y], article 1)
+- `<author>`: E. Conradie (full name from PDF)
+- `<editor>`: if there is a named journal editor, include; otherwise omit
+- `<respStmt>` blocks:
+  - `<resp>XML encoded by</resp>` → `<name>Hope Chang</name>`
+  - `<resp>Encoded by</resp>` → `<name>Computational Theology Lab at Yale Divinity Library</name>`
+  - `<resp>Revised by</resp>` → `<name>Computational Theology Lab at Yale Divinity Library</name>`
+  - Additional roles (digitization, browser display, etc.) left as `tbd`
+- `<funder>` / `<sponsor>`: **Leave as `tbd`**
+
+### `<editionStmt>`
+- Edition label and date: 2026-03-16
+- `<respStmt>`: `<resp>TEI P5-conform encoding by</resp>` → `<name>Computational Theology Lab at Yale Divinity Library</name>`
+
+### `<publicationStmt>`
+- `<publisher>`, `<pubPlace>`, `<distributor>`: **tbd**
+- `<date>`: 2026
+- `<availability>`: CC-BY license (Creative Commons Attribution)
+
+### `<sourceDesc>` / `<biblStruct>`
+Fill from PDF content:
+- `<analytic>`: author + article title
+- `<monogr>`: journal title, editor, imprint (pubPlace, publisher, date, volume, issue, article number, page range)
+
+### `<encodingDesc>`
+- `<projectDesc>`: Brief description — this project encodes JRS articles as TEI P5 XML for scholarly access and digital humanities research, led by the Computational Theology Lab at Yale Divinity Library
+- `<samplingDecl>`: Full text of each article is encoded; paratextual material (advertisements, journal covers) excluded
+- `<editorialDecl>`: Text transcribed from PDF; line-end hyphens normalized; original pagination preserved with `<pb/>`; footnotes retained in `<back>`
+
+### `<profileDesc>` / `<langUsage>`
+- Primary language of the article (English, based on JRS context; Latin if quoted)
+
+### `<revisionDesc>`
+- Add one `<change>` entry dated 2026-03-16 for initial encoding
+
+---
+
+## TEI Body Plan
+
+The `<text>` element will contain `<front>`, `<body>`, and `<back>` as appropriate.
+
+### `<front>` (if article has an abstract or prefatory matter)
+- `<div type="abstract">` with abstract text if present
+
+### `<body>`
+- Top-level `<div>` for the article body
+- Named subsections encoded as `<div type="section">` with `<head>` if headings are present
+- Each paragraph → `<p>`
+- Inline emphasis (italics, bold) → `<hi rend="italic">` / `<hi rend="bold">`
+- Quoted titles → `<title>`
+- Footnote markers in text → `<ref target="#fnN"/>` or `<note place="foot" n="N">` inline, depending on structure
+
+### `<back>` (if article has footnotes/endnotes or bibliography at end)
+- `<div type="notes">` with `<note xml:id="fnN">` elements for each footnote
+- `<div type="bibliography">` with `<listBibl>` and `<bibl>` entries if a references list is present
+
+---
+
+## Encoding Decisions
+
+| Element | Decision |
+|---|---|
+| Schema | TEI All (tei_all.rng), as specified in template |
+| Namespace | `http://www.tei-c.org/ns/1.0` |
+| Footnotes | Encoded in `<back>` as `<note>` elements with xml:id; referenced inline with `<ref>` |
+| Hyphenated line-breaks | Normalized (hyphens from line-wrapping removed; preserved only where meaningful) |
+| Original page breaks | Marked with `<pb n="X"/>` to preserve pagination |
+| Special characters | Encoded as Unicode (UTF-8); no numeric entities unless necessary |
+
+---
+
+## Verification
+
+After the XML file is written:
+1. Open in an XML editor (e.g., oXygen, VS Code with XML plugin) and validate against `tei_all.rng`
+2. Confirm that all text from the PDF is present in the body, in order
+3. Confirm footnote references in body correspond to footnote definitions in `<back>`
+4. Confirm header bibliographic data matches PDF cover/first page
+5. Check language tag(s) are correct ISO codes (`en`, `la`, etc.)
+
+---
+
+## Confirmed Decisions
+
+| Field | Value |
+|---|---|
+| Encoder | Hope Chang |
+| Institution | Computational Theology Lab at Yale Divinity Library |
+| Publisher / pubPlace / distributor | tbd |
+| Availability | CC-BY (Creative Commons Attribution) |
+| encodingDesc | Brief placeholder text (see above) |
+
+## Remaining tbd fields (user to fill in later)
+- `<funder>`, `<sponsor>`
+- `<publisher>`, `<pubPlace>`, `<distributor>` in `<publicationStmt>`
+- First digitization credits in `<respStmt>`
